@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as Cst from '../../constants';
 
 interface Props {
   gameWidth?: number;
@@ -9,19 +10,18 @@ interface Props {
 
 export const Tetrisudoku: React.FC<Props> = (props) => {
   const { gameHeight, gameWidth } = props;
-  const [board, setBoard] = useState<Array<number>[]>([]);
+  const [boardState, setBoardState] = useState<Array<Array<number>>>([]);
 
   useEffect(() => {
-    //initialize Board
-    setBoard(new Array(gameHeight));
+    setBoardState(new Array(gameHeight).fill(new Array(gameWidth).fill(0)));
   }, []);
 
-  return <div>{props.gameHeight}</div>;
+  return <div>{gameHeight}</div>;
 };
 
 Tetrisudoku.defaultProps = {
-  gameWidth: 9,
-  gameHeight: 9,
-  blockWidth: 3,
-  blockHeight: 3,
+  gameWidth: Cst.DEFAULT_GAME_WIDTH,
+  gameHeight: Cst.DEFAULT_GAME_HEIGHT,
+  blockWidth: Cst.DEFAULT_BLOCK_WIDTH,
+  blockHeight: Cst.DEFAULT_BLOCK_HEIGHT,
 } as Partial<Props>;
