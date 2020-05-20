@@ -1,4 +1,6 @@
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { ElementPreview } from './ElementPreview';
+import Tile from './Tile';
 import styled from 'styled-components';
 import * as Cst from '../../constants';
 
@@ -9,15 +11,24 @@ type Props = {
   verticalBlocks?: number;
 };
 
-type WrapperProps = {
+type PlaceholderProps = {
   width: number;
+  height: number;
 };
 
-type TileProps = {
-  filled?: number;
-};
+const Game = styled.div`
+  position: relative;
+  width: 50%;
+  left: 25%;
+`;
 
-const BoardWrapper = styled.div<WrapperProps>`
+const Board = styled.div`
+  display: inline-block;
+  position: relative;
+  width: 100%;
+`;
+
+const BoardGridWrapper = styled.div<WrapperProps>`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -25,24 +36,35 @@ const BoardWrapper = styled.div<WrapperProps>`
   right: 0;
   display: grid;
   grid-template-columns: repeat(${(props) => props.width}, 1fr);
-  grid-row-gap: 1px;
-  grid-column-gap: 1px;
+  grid-row-gap: 0px;
+  grid-column-gap: 0px;
 `;
 
 const BlockWrapper = styled.div<WrapperProps>`
-  border: 1px solid #000;
+  border: 1px solid ${Cst.BLOCK_BORDER_COLOR};
   display: grid;
   grid-template-columns: repeat(${(props) => props.width}, 1fr);
   grid-row-gap: 1px;
   grid-column-gap: 1px;
 `;
 
-const Tile = styled.div<TileProps>`
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-  background-color: ${(props) => (props.filled ? '#FF0000' : '#FFFF00')};
+const DummyPlaceholder = styled.div<PlaceholderProps>`
+  margin-top: ${(props) => (props.height / props.width) * 100}%;
 `;
+
+declare global {
+  interface Array<T> {
+    deepClone(): Array<T>;
+  }
+}
+
+Array.prototype.deepClone = function() {
+  return JSON.parse(JSON.stringify(this));
+};
+
+const randomElement = () => {
+  return Cst.ELEMENTS[Math.floor(Math.random() * Cst.ELEMENTS.length)];
+};
 
 export const Tetrisudoku: React.FC<Props> = ({
   blockWidth = Cst.DEFAULT_BLOCK_WIDTH,
@@ -56,21 +78,109 @@ export const Tetrisudoku: React.FC<Props> = ({
     new Array(boardWidth).fill(0)
   );
   const [boardState, setBoardState] = useState<number[][]>(initialBoardState);
+  const [hoverState, setHoverState] = useState<number[][]>(initialBoardState);
+  const [nextElement, setNextElement] = useState<ElemCoord[]>(randomElement());
+  const [score, setScore] = useState<number>(0);
 
   useEffect(() => {
+    let blockWasCleared = false;
+
     for (let yBlock = 0; yBlock < verticalBlocks; yBlock++) {
       for (let xBlock = 0; xBlock < horizontalBlocks; xBlock++) {
         if (checkBlock(xBlock, yBlock)) {
           clearBlock(xBlock, yBlock);
+          blockWasCleared = true;
         }
       }
+    }
+    if (!blockWasCleared && !isElementPlacable(nextElement)) {
+      alert('Game over! :-(');
     }
   }, [boardState]);
 
   function changeState(x: number, y: number, value: number) {
-    let tempState = [...boardState];
+    let tempState = boardState.deepClone();
     tempState[y][x] = value;
     setBoardState(tempState);
+  }
+
+  function canElementBeDropped(x: number, y: number, elem: ElemCoord[]) {
+    // TODO: refactor to consolidate for loop
+  }
+
+  const addElement = (x: number, y: number, element: ElemCoord[]) =>
+    useCallback(
+      (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        let tempState = boardState.deepClone();
+
+        for (const elemCoord of element) {
+          if (
+            boardState[y + elemCoord.y] !== undefined &&
+            boardState[y + elemCoord.y][x + elemCoord.x] !== undefined &&
+            boardState[y + elemCoord.y][x + elemCoord.x] === 0
+          ) {
+            tempState[y + elemCoord.y][x + elemCoord.x] = elemCoord.val;
+          } else {
+            // TODO: Display message
+            alert('hier nicht');
+            return;
+          }
+        }
+
+        setBoardState(tempState);
+        setNextElement(randomElement());
+      },
+      [boardState, element]
+    );
+
+  const handleMouseOver = (x: number, y: number, element: ElemCoord[]) =>
+    useCallback(
+      (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        let tempState = initialBoardState.deepClone();
+        let isDroppable = true;
+
+        for (const elemCoord of element) {
+          if (
+            boardState[y + elemCoord.y] !== undefined &&
+            boardState[y + elemCoord.y][x + elemCoord.x] !== undefined
+          ) {
+            tempState[y + elemCoord.y][x + elemCoord.x] = 1;
+            if (boardState[y + elemCoord.y][x + elemCoord.x] !== 0) {
+              isDroppable = false;
+            }
+          } else {
+            isDroppable = false;
+          }
+        }
+
+        if (!isDroppable) {
+          tempState = tempState.map((row) =>
+            row.map((item) => (item !== 0 ? item * -1 : 0))
+          );
+        }
+
+        setHoverState(tempState);
+      },
+      [element, boardState]
+    );
+
+  function isElementPlacable(elem: ElemCoord[]) {
+    for (let y = 0; y < boardHeight; y++) {
+      for (let x = 0; x < boardWidth; x++) {
+        let isDroppable = true;
+        for (const elemCoord of elem) {
+          if (
+            boardState[y + elemCoord.y] === undefined ||
+            boardState[y + elemCoord.y][x + elemCoord.x] === undefined ||
+            boardState[y + elemCoord.y][x + elemCoord.x] !== 0
+          ) {
+            isDroppable = false;
+          }
+        }
+        if (isDroppable) return true;
+      }
+    }
+    return false;
   }
 
   function iterateBlock(
@@ -86,32 +196,36 @@ export const Tetrisudoku: React.FC<Props> = ({
   }
 
   function clearBlock(xBlock: number, yBlock: number): void {
-    let tempState = [...boardState];
+    let tempState = boardState.deepClone();
+    let addScore = 0;
+
     iterateBlock(xBlock, yBlock, (x: number, y: number) => {
       tempState[y][x] = 0;
+      addScore += boardState[y][x];
     });
+
+    setScore((oldScore) => oldScore + addScore);
     setBoardState(tempState);
   }
 
   function checkBlock(xBlock: number, yBlock: number): boolean {
     let result = true;
     iterateBlock(xBlock, yBlock, (x: number, y: number) => {
-      if (boardState[y][x] === 0) {
-        result = false;
-      }
+      if (boardState[y][x] === 0) result = false;
     });
     return result;
   }
 
   function drawBlock(xBlock: number, yBlock: number) {
-    // TODO: any type ändern
-    let tiles: any[] = [];
+    let tiles: JSX.Element[] = [];
     iterateBlock(xBlock, yBlock, (x: number, y: number) => {
       tiles.push(
         <Tile
           key={`${x}${y}`}
-          filled={boardState[y][x]}
-          onClick={() => changeState(x, y, 1)}
+          state={boardState[y][x]}
+          hover={hoverState[y][x]}
+          onClick={addElement(x, y, nextElement)}
+          onMouseOver={handleMouseOver(x, y, nextElement)}
         />
       );
     });
@@ -124,7 +238,7 @@ export const Tetrisudoku: React.FC<Props> = ({
   }
 
   function drawBlocks() {
-    let blocks = [];
+    let blocks: JSX.Element[] = [];
     for (let y = 0; y < verticalBlocks; y++) {
       for (let x = 0; x < horizontalBlocks; x++) {
         blocks.push(drawBlock(x, y));
@@ -133,5 +247,19 @@ export const Tetrisudoku: React.FC<Props> = ({
     return blocks;
   }
 
-  return <BoardWrapper width={3}>{drawBlocks()}</BoardWrapper>;
+  return (
+    <Game>
+      <Board>
+        <DummyPlaceholder
+          width={horizontalBlocks * blockWidth}
+          height={verticalBlocks * blockHeight}
+        />
+        <BoardGridWrapper width={horizontalBlocks}>
+          {drawBlocks()}
+        </BoardGridWrapper>
+      </Board>
+      <ElementPreview element={nextElement} />
+      Score: {score}
+    </Game>
+  );
 };

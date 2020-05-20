@@ -5,23 +5,8 @@ import { Tetrisudoku } from './components/Tetrisudoku';
 
 import './styles.scss';
 
-const GameContainer = styled.div`
-  display: inline-block;
-  position: relative;
-  width: 50%;
-`;
-
-const DummyPlaceholder = styled.div`
-  margin-top: 100%;
-`;
-
 function App() {
-  return (
-    <GameContainer>
-      <DummyPlaceholder />
-      <Tetrisudoku />
-    </GameContainer>
-  );
+  return <Tetrisudoku />;
 }
 
 const rootElement = document.getElementById('root');
