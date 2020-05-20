@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import styled from 'styled-components';
 import { ElementPreview } from './ElementPreview';
 import Tile from './Tile';
-import styled from 'styled-components';
 import * as Cst from '../../constants';
 
 type Props = {
@@ -18,14 +18,26 @@ type PlaceholderProps = {
 
 const Game = styled.div`
   position: relative;
-  width: 50%;
-  left: 25%;
+  width: 70%;
+  left: 15%;
+  display: grid;
+  grid-template-columns: 80% 20%;
+  grid-column-gap: 7px;
+
+  @media (min-width: 1200px) {
+    width: 50%;
+    left: 25%;
+  }
 `;
 
 const Board = styled.div`
   display: inline-block;
   position: relative;
   width: 100%;
+  grid-column: 1 / 2;
+  @media (max-width: 768px) {
+    grid-column: 1 / 3;
+  }
 `;
 
 const BoardGridWrapper = styled.div<WrapperProps>`
@@ -104,65 +116,58 @@ export const Tetrisudoku: React.FC<Props> = ({
     setBoardState(tempState);
   }
 
-  function canElementBeDropped(x: number, y: number, elem: ElemCoord[]) {
-    // TODO: refactor to consolidate for loop
-  }
+  const addElement = useCallback(
+    (x: number, y: number, element: ElemCoord[]) => {
+      let tempState = boardState.deepClone();
 
-  const addElement = (x: number, y: number, element: ElemCoord[]) =>
-    useCallback(
-      (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        let tempState = boardState.deepClone();
-
-        for (const elemCoord of element) {
-          if (
-            boardState[y + elemCoord.y] !== undefined &&
-            boardState[y + elemCoord.y][x + elemCoord.x] !== undefined &&
-            boardState[y + elemCoord.y][x + elemCoord.x] === 0
-          ) {
-            tempState[y + elemCoord.y][x + elemCoord.x] = elemCoord.val;
-          } else {
-            // TODO: Display message
-            alert('hier nicht');
-            return;
-          }
+      for (const elemCoord of element) {
+        if (
+          boardState[y + elemCoord.y] !== undefined &&
+          boardState[y + elemCoord.y][x + elemCoord.x] !== undefined &&
+          boardState[y + elemCoord.y][x + elemCoord.x] === 0
+        ) {
+          tempState[y + elemCoord.y][x + elemCoord.x] = elemCoord.val;
+        } else {
+          // TODO: Display message
+          return;
         }
+      }
 
-        setBoardState(tempState);
-        setNextElement(randomElement());
-      },
-      [boardState, element]
-    );
+      setHoverState(initialBoardState.deepClone());
+      setBoardState(tempState);
+    },
+    [boardState]
+  );
 
-  const handleMouseOver = (x: number, y: number, element: ElemCoord[]) =>
-    useCallback(
-      (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        let tempState = initialBoardState.deepClone();
-        let isDroppable = true;
+  const handleHover = useCallback(
+    (x: number, y: number, element: ElemCoord[]) => {
+      let tempState = initialBoardState.deepClone();
+      let isDroppable = true;
 
-        for (const elemCoord of element) {
-          if (
-            boardState[y + elemCoord.y] !== undefined &&
-            boardState[y + elemCoord.y][x + elemCoord.x] !== undefined
-          ) {
-            tempState[y + elemCoord.y][x + elemCoord.x] = 1;
-            if (boardState[y + elemCoord.y][x + elemCoord.x] !== 0) {
-              isDroppable = false;
-            }
-          } else {
+      for (const elemCoord of element) {
+        if (
+          boardState[y + elemCoord.y] !== undefined &&
+          boardState[y + elemCoord.y][x + elemCoord.x] !== undefined
+        ) {
+          tempState[y + elemCoord.y][x + elemCoord.x] = 1;
+          if (boardState[y + elemCoord.y][x + elemCoord.x] !== 0) {
             isDroppable = false;
           }
+        } else {
+          isDroppable = false;
         }
+      }
 
-        if (!isDroppable) {
-          tempState = tempState.map((row) =>
-            row.map((item) => (item !== 0 ? item * -1 : 0))
-          );
-        }
+      if (!isDroppable) {
+        tempState = tempState.map((row) =>
+          row.map((item) => (item !== 0 ? item * -1 : 0))
+        );
+      }
 
-        setHoverState(tempState);
-      },
-      [element, boardState]
-    );
+      setHoverState(tempState);
+    },
+    [boardState]
+  );
 
   function isElementPlacable(elem: ElemCoord[]) {
     for (let y = 0; y < boardHeight; y++) {
@@ -222,10 +227,12 @@ export const Tetrisudoku: React.FC<Props> = ({
       tiles.push(
         <Tile
           key={`${x}${y}`}
+          x={x}
+          y={y}
           state={boardState[y][x]}
           hover={hoverState[y][x]}
-          onClick={addElement(x, y, nextElement)}
-          onMouseOver={handleMouseOver(x, y, nextElement)}
+          onDrop={addElement}
+          onHover={handleHover}
         />
       );
     });
@@ -258,8 +265,8 @@ export const Tetrisudoku: React.FC<Props> = ({
           {drawBlocks()}
         </BoardGridWrapper>
       </Board>
-      <ElementPreview element={nextElement} />
-      Score: {score}
+      <ElementPreview />
+      <div> Score: {score}</div>
     </Game>
   );
 };

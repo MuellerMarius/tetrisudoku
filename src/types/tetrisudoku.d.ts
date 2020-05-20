@@ -8,3 +8,8 @@ type WrapperProps = {
   width: number;
   height?: number;
 };
+
+type dragItem = {
+  type: any;
+  element: ElemCoord[];
+};

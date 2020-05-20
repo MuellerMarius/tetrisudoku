@@ -1,10 +1,8 @@
 import React, { useEffect, useState, ReactNode } from 'react';
 import styled from 'styled-components';
-import * as Cst from '../../constants';
 
-type Props = {
-  element: ElemCoord[];
-};
+import { useDrag } from 'react-dnd';
+import * as Cst from '../../constants';
 
 type minmax = {
   x: number;
@@ -12,10 +10,10 @@ type minmax = {
 };
 
 const Wrapper = styled.div`
-  background-color: #ccc;
+  background-color: #efefef;
   position: relative;
   width: 100%;
-  height: 125px;
+  height: 100%;
 `;
 
 const PreviewGrid = styled.div<WrapperProps>`
@@ -38,8 +36,17 @@ const GridElement = styled.div<ElemCoord>`
   height: 25px;
 `;
 
-export const ElementPreview: React.FC<Props> = (props) => {
-  const { element } = props;
+const randomElement = () => {
+  return Cst.ELEMENTS[Math.floor(Math.random() * Cst.ELEMENTS.length)];
+};
+
+export const ElementPreview: React.FC<any> = () => {
+  const [element, setNextElement] = useState<ElemCoord[]>(randomElement());
+  const [{ isDragging }, drag] = useDrag({
+    item: { type: Cst.ItemTypes.ELEMENT, element },
+    collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
+  });
+
   const [maxValues, setMaxValues] = useState<minmax>({ x: 0, y: 0 });
   const [minValues, setMinValues] = useState<minmax>({ x: 0, y: 0 });
 
@@ -67,6 +74,7 @@ export const ElementPreview: React.FC<Props> = (props) => {
       <PreviewGrid
         width={maxValues.x - minValues.x + 1}
         height={maxValues.y - minValues.y + 1}
+        ref={drag}
       >
         {element.map((elemCoord, i) => (
           <GridElement

@@ -3,7 +3,10 @@ export const DEFAULT_VERTICAL_BLOCKS = 4;
 export const DEFAULT_BLOCK_WIDTH = 3;
 export const DEFAULT_BLOCK_HEIGHT = 3;
 export const BLOCK_COLORS = ['#def4f0', '#74d4c0', '#d9455f', '#9a1f40'];
-export const BLOCK_BORDER_COLOR = '#b9ebe0';
+export const BLOCK_BORDER_COLOR = '#74d8c2';
+export const ItemTypes = {
+  ELEMENT: 'element',
+};
 export const ELEMENTS = [
   [
     // long z
