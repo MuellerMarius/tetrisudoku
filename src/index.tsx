@@ -16,7 +16,7 @@ function App() {
     <>
       <GlobalStyle />
       <DndProvider backend={Backend}>
-        <Tetrisudoku horizontalBlocks={6} verticalBlocks={6} />
+        <Tetrisudoku />
       </DndProvider>
     </>
   );

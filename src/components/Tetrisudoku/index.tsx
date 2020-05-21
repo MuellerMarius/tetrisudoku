@@ -47,7 +47,7 @@ const BoardGridWrapper = styled.div<WrapperProps>`
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: repeat(${(props) => props.width}, 1fr);
+  grid-template-columns: repeat(${({ width }) => width}, 1fr);
   grid-row-gap: 0px;
   grid-column-gap: 0px;
 `;
@@ -55,13 +55,13 @@ const BoardGridWrapper = styled.div<WrapperProps>`
 const BlockWrapper = styled.div<WrapperProps>`
   border: 1px solid ${Cst.BLOCK_BORDER_COLOR};
   display: grid;
-  grid-template-columns: repeat(${(props) => props.width}, 1fr);
+  grid-template-columns: repeat(${({ width }) => width}, 1fr);
   grid-row-gap: 1px;
   grid-column-gap: 1px;
 `;
 
 const DummyPlaceholder = styled.div<PlaceholderProps>`
-  margin-top: ${(props) => (props.height / props.width) * 100}%;
+  margin-top: ${({ width, height }) => (height / width) * 100}%;
 `;
 
 declare global {
@@ -72,10 +72,6 @@ declare global {
 
 Array.prototype.deepClone = function() {
   return JSON.parse(JSON.stringify(this));
-};
-
-const randomElement = () => {
-  return Cst.ELEMENTS[Math.floor(Math.random() * Cst.ELEMENTS.length)];
 };
 
 export const Tetrisudoku: React.FC<Props> = ({
@@ -91,7 +87,6 @@ export const Tetrisudoku: React.FC<Props> = ({
   );
   const [boardState, setBoardState] = useState<number[][]>(initialBoardState);
   const [hoverState, setHoverState] = useState<number[][]>(initialBoardState);
-  const [nextElement, setNextElement] = useState<ElemCoord[]>(randomElement());
   const [score, setScore] = useState<number>(0);
 
   useEffect(() => {
@@ -105,16 +100,11 @@ export const Tetrisudoku: React.FC<Props> = ({
         }
       }
     }
-    if (!blockWasCleared && !isElementPlacable(nextElement)) {
-      alert('Game over! :-(');
-    }
+    // TODO: nextElements über DragEvent
+    // if (!blockWasCleared && !isElementPlacable(nextElement)) {
+    //   alert('Game over! :-(');
+    // }
   }, [boardState]);
-
-  function changeState(x: number, y: number, value: number) {
-    let tempState = boardState.deepClone();
-    tempState[y][x] = value;
-    setBoardState(tempState);
-  }
 
   const addElement = useCallback(
     (x: number, y: number, element: ElemCoord[]) => {
@@ -165,6 +155,24 @@ export const Tetrisudoku: React.FC<Props> = ({
       }
 
       setHoverState(tempState);
+    },
+    [boardState]
+  );
+
+  const canElementBeDropped = useCallback(
+    (x: number, y: number, element: ElemCoord[]) => {
+      let isDroppable = true;
+
+      for (const elemCoord of element) {
+        if (
+          boardState[y + elemCoord.y] === undefined ||
+          boardState[y + elemCoord.y][x + elemCoord.x] === undefined ||
+          boardState[y + elemCoord.y][x + elemCoord.x] !== 0
+        ) {
+          isDroppable = false;
+        }
+      }
+      return isDroppable;
     },
     [boardState]
   );
@@ -233,6 +241,7 @@ export const Tetrisudoku: React.FC<Props> = ({
           hover={hoverState[y][x]}
           onDrop={addElement}
           onHover={handleHover}
+          canDrop={canElementBeDropped}
         />
       );
     });
@@ -265,7 +274,7 @@ export const Tetrisudoku: React.FC<Props> = ({
           {drawBlocks()}
         </BoardGridWrapper>
       </Board>
-      <ElementPreview />
+      <ElementPreview setHover={handleHover} />
       <div> Score: {score}</div>
     </Game>
   );
