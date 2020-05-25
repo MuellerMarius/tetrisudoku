@@ -1,32 +1,52 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, ReactChild } from 'react';
 import styled from 'styled-components';
-import { ElementPreview } from './ElementPreview';
+import { ScoreAnimation } from './ScoreAnimation';
+import CustomDragLayer from './CustomDragLayer';
+import DragElement from './DragElement';
 import Tile from './Tile';
 import * as Cst from '../../constants';
 
-type Props = {
+//
+// Types
+//
+
+type TetrissudokuProps = {
   blockWidth?: number;
   blockHeight?: number;
   horizontalBlocks?: number;
   verticalBlocks?: number;
 };
 
-type PlaceholderProps = {
+type LayoutStretcherProps = {
   width: number;
   height: number;
 };
 
+type ElementsWrapperProps = {
+  itemCount: number;
+};
+
+declare global {
+  interface Array<T> {
+    deepClone(): Array<T>;
+  }
+}
+
+//
+// Styles
+//
+
 const Game = styled.div`
   position: relative;
-  width: 70%;
-  left: 15%;
+  width: 85%;
+  left: 7.5%;
   display: grid;
   grid-template-columns: 80% 20%;
   grid-column-gap: 7px;
 
   @media (min-width: 1200px) {
-    width: 50%;
-    left: 25%;
+    width: 65%;
+    left: 17.5%;
   }
 `;
 
@@ -40,7 +60,53 @@ const Board = styled.div`
   }
 `;
 
-const BoardGridWrapper = styled.div<WrapperProps>`
+const Sidebar = styled.div`
+  position: relative;
+  width: 100%;
+  background-color: ${Cst.BOARD_BG_COLOR};
+
+  @media (max-width: 768px) {
+    margin-top: 5px;
+    grid-column: 1 / 3;
+  }
+`;
+
+const Score = styled.div`
+  margin-top: 15px;
+  width: 100%;
+  text-align: center;
+
+  & p {
+    margin-bottom: 0;
+    margin-top: 10px;
+    font-size: 25pt;
+
+    @media (min-width: 992px) {
+      font-size: 40pt;
+    }
+  }
+`;
+
+const ElementsWrapper = styled.div<ElementsWrapperProps>`
+  position: relative;
+  width: 100%;
+  height: 80%;
+  display: grid;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(${({ itemCount }) => itemCount}, 1fr);
+    grid-column-gap: 10px;
+    min-height: 125px;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-rows: repeat(${({ itemCount }) => itemCount}, 1fr);
+    grid-row-gap: 10px;
+    justify-content: center;
+  }
+`;
+
+const BlockWrapper = styled.div<WrapperProps>`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -50,9 +116,11 @@ const BoardGridWrapper = styled.div<WrapperProps>`
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
   grid-row-gap: 0px;
   grid-column-gap: 0px;
+  background-color: ${Cst.BOARD_BG_COLOR};
 `;
 
-const BlockWrapper = styled.div<WrapperProps>`
+const Block = styled.div<WrapperProps>`
+  position: relative;
   border: 1px solid ${Cst.BLOCK_BORDER_COLOR};
   display: grid;
   grid-template-columns: repeat(${({ width }) => width}, 1fr);
@@ -60,34 +128,47 @@ const BlockWrapper = styled.div<WrapperProps>`
   grid-column-gap: 1px;
 `;
 
-const DummyPlaceholder = styled.div<PlaceholderProps>`
+const LayoutStretcher = styled.div<LayoutStretcherProps>`
   margin-top: ${({ width, height }) => (height / width) * 100}%;
 `;
 
-declare global {
-  interface Array<T> {
-    deepClone(): Array<T>;
-  }
-}
+//
+// Functions
+//
 
 Array.prototype.deepClone = function() {
   return JSON.parse(JSON.stringify(this));
 };
 
-export const Tetrisudoku: React.FC<Props> = ({
+const randomDragElement = () => {
+  return Cst.ELEMENTS[Math.floor(Math.random() * Cst.ELEMENTS.length)];
+};
+
+export const Tetrisudoku: React.FC<TetrissudokuProps> = ({
   blockWidth = Cst.DEFAULT_BLOCK_WIDTH,
   blockHeight = Cst.DEFAULT_BLOCK_HEIGHT,
   horizontalBlocks = Cst.DEFAULT_HORIZONTAL_BLOCKS,
   verticalBlocks = Cst.DEFAULT_VERTICAL_BLOCKS,
-}: Props) => {
-  const boardWidth = horizontalBlocks * blockWidth;
-  const boardHeight = verticalBlocks * blockHeight;
-  const initialBoardState = Array.from(Array(boardHeight), () =>
-    new Array(boardWidth).fill(0)
+}: TetrissudokuProps) => {
+  const initialAnimState = Array(horizontalBlocks * verticalBlocks).fill(0);
+  const initialBoardState = Array.from(
+    Array(verticalBlocks * blockHeight),
+    () => new Array(horizontalBlocks * blockWidth).fill(0)
   );
+
   const [boardState, setBoardState] = useState<number[][]>(initialBoardState);
   const [hoverState, setHoverState] = useState<number[][]>(initialBoardState);
   const [score, setScore] = useState<number>(0);
+  const [scoreAnimations, setScoreAnim] = useState<number[]>(initialAnimState);
+  const [dragElements, setDragElements] = useState<ElemCoord[][]>([
+    randomDragElement(),
+    randomDragElement(),
+    randomDragElement(),
+  ]);
+
+  //
+  // Logic
+  //
 
   useEffect(() => {
     let blockWasCleared = false;
@@ -100,17 +181,28 @@ export const Tetrisudoku: React.FC<Props> = ({
         }
       }
     }
-    // TODO: nextElements über DragEvent
-    // if (!blockWasCleared && !isElementPlacable(nextElement)) {
-    //   alert('Game over! :-(');
-    // }
-  }, [boardState]);
 
-  const addElement = useCallback(
-    (x: number, y: number, element: ElemCoord[]) => {
-      let tempState = boardState.deepClone();
+    if (
+      !blockWasCleared &&
+      dragElements.length > 0 &&
+      !isAnyElementPlaceable()
+    ) {
+      setDragElements([]);
+      alert('Game over!');
+    }
+  }, [boardState, dragElements]);
 
-      for (const elemCoord of element) {
+  const setNewDragElement = (index: number) => {
+    const tempElements = dragElements.deepClone();
+    tempElements[index] = randomDragElement();
+    setDragElements(tempElements);
+  };
+
+  const dropElement = useCallback(
+    (x: number, y: number, index: number) => {
+      const tempState = boardState.deepClone();
+
+      for (const elemCoord of dragElements[index]) {
         if (
           boardState[y + elemCoord.y] !== undefined &&
           boardState[y + elemCoord.y][x + elemCoord.x] !== undefined &&
@@ -118,21 +210,21 @@ export const Tetrisudoku: React.FC<Props> = ({
         ) {
           tempState[y + elemCoord.y][x + elemCoord.x] = elemCoord.val;
         } else {
-          // TODO: Display message
           return;
         }
       }
 
-      setHoverState(initialBoardState.deepClone());
       setBoardState(tempState);
+      setNewDragElement(index);
     },
-    [boardState]
+    [boardState, dragElements]
   );
 
-  const handleHover = useCallback(
-    (x: number, y: number, element: ElemCoord[]) => {
+  const hoverElement = useCallback(
+    (x: number, y: number, index: number) => {
+      const element = index >= 0 ? dragElements[index] : [];
       let tempState = initialBoardState.deepClone();
-      let isDroppable = true;
+      let canBeDropped = true;
 
       for (const elemCoord of element) {
         if (
@@ -141,14 +233,14 @@ export const Tetrisudoku: React.FC<Props> = ({
         ) {
           tempState[y + elemCoord.y][x + elemCoord.x] = 1;
           if (boardState[y + elemCoord.y][x + elemCoord.x] !== 0) {
-            isDroppable = false;
+            canBeDropped = false;
           }
         } else {
-          isDroppable = false;
+          canBeDropped = false;
         }
       }
 
-      if (!isDroppable) {
+      if (!canBeDropped) {
         tempState = tempState.map((row) =>
           row.map((item) => (item !== 0 ? item * -1 : 0))
         );
@@ -156,60 +248,71 @@ export const Tetrisudoku: React.FC<Props> = ({
 
       setHoverState(tempState);
     },
-    [boardState]
+    [boardState, dragElements]
   );
 
   const canElementBeDropped = useCallback(
-    (x: number, y: number, element: ElemCoord[]) => {
-      let isDroppable = true;
+    (x: number, y: number, index: number) => {
+      let canBeDropped = true;
 
-      for (const elemCoord of element) {
+      for (const elemCoord of dragElements[index]) {
         if (
           boardState[y + elemCoord.y] === undefined ||
           boardState[y + elemCoord.y][x + elemCoord.x] === undefined ||
           boardState[y + elemCoord.y][x + elemCoord.x] !== 0
         ) {
-          isDroppable = false;
+          canBeDropped = false;
         }
       }
-      return isDroppable;
+      return canBeDropped;
     },
-    [boardState]
+    [boardState, dragElements]
   );
 
-  function isElementPlacable(elem: ElemCoord[]) {
+  const isAnyElementPlaceable = () => {
+    for (const element of dragElements) {
+      if (isElementPlacable(element)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const isElementPlacable = (elem: ElemCoord[]) => {
+    const boardWidth = horizontalBlocks * blockWidth;
+    const boardHeight = verticalBlocks * blockHeight;
     for (let y = 0; y < boardHeight; y++) {
       for (let x = 0; x < boardWidth; x++) {
-        let isDroppable = true;
+        let canBeDropped = true;
         for (const elemCoord of elem) {
           if (
             boardState[y + elemCoord.y] === undefined ||
             boardState[y + elemCoord.y][x + elemCoord.x] === undefined ||
             boardState[y + elemCoord.y][x + elemCoord.x] !== 0
           ) {
-            isDroppable = false;
+            canBeDropped = false;
           }
         }
-        if (isDroppable) return true;
+        if (canBeDropped) return true;
       }
     }
     return false;
-  }
+  };
 
-  function iterateBlock(
+  const iterateBlock = (
     xBlock: number,
     yBlock: number,
-    func: (x: number, y: number) => any
-  ) {
+    func: (x: number, y: number) => boolean | void
+  ) => {
     for (let y = yBlock * blockHeight; y < (yBlock + 1) * blockHeight; y++) {
       for (let x = xBlock * blockWidth; x < (xBlock + 1) * blockWidth; x++) {
         func.apply(null, [x, y]);
       }
     }
-  }
+  };
 
-  function clearBlock(xBlock: number, yBlock: number): void {
-    let tempState = boardState.deepClone();
+  const clearBlock = (xBlock: number, yBlock: number) => {
+    const tempState = boardState.deepClone();
     let addScore = 0;
 
     iterateBlock(xBlock, yBlock, (x: number, y: number) => {
@@ -217,65 +320,98 @@ export const Tetrisudoku: React.FC<Props> = ({
       addScore += boardState[y][x];
     });
 
+    setScoreAnim((scoreAnimations) =>
+      scoreAnimations.map((elem, index) =>
+        index === yBlock * horizontalBlocks + xBlock ? addScore : elem
+      )
+    );
+
     setScore((oldScore) => oldScore + addScore);
     setBoardState(tempState);
-  }
+  };
 
-  function checkBlock(xBlock: number, yBlock: number): boolean {
+  const checkBlock = (xBlock: number, yBlock: number): boolean => {
     let result = true;
     iterateBlock(xBlock, yBlock, (x: number, y: number) => {
       if (boardState[y][x] === 0) result = false;
     });
     return result;
-  }
+  };
 
-  function drawBlock(xBlock: number, yBlock: number) {
-    let tiles: JSX.Element[] = [];
+  //
+  // Presentation
+  //
+
+  const renderBlock = (xBlock: number, yBlock: number) => {
+    const tiles: ReactChild[] = [];
+    const index = yBlock * horizontalBlocks + xBlock;
     iterateBlock(xBlock, yBlock, (x: number, y: number) => {
       tiles.push(
         <Tile
           key={`${x}${y}`}
           x={x}
           y={y}
-          state={boardState[y][x]}
+          value={boardState[y][x]}
           hover={hoverState[y][x]}
-          onDrop={addElement}
-          onHover={handleHover}
+          onDrop={dropElement}
+          onHover={hoverElement}
           canDrop={canElementBeDropped}
         />
       );
     });
 
     return (
-      <BlockWrapper width={blockWidth} key={`${xBlock}${yBlock}`}>
+      <Block width={blockWidth} key={index}>
         {tiles}
-      </BlockWrapper>
+        {scoreAnimations[index] > 0 && (
+          <ScoreAnimation
+            score={scoreAnimations[index]}
+            onAnimationEnd={() =>
+              setScoreAnim((scoreAnimations) =>
+                scoreAnimations.map((elem, i) => (i === index ? 0 : elem))
+              )
+            }
+          />
+        )}
+      </Block>
     );
-  }
+  };
 
-  function drawBlocks() {
-    let blocks: JSX.Element[] = [];
+  const renderBlocks = () => {
+    const blocks: ReactChild[] = [];
     for (let y = 0; y < verticalBlocks; y++) {
       for (let x = 0; x < horizontalBlocks; x++) {
-        blocks.push(drawBlock(x, y));
+        blocks.push(renderBlock(x, y));
       }
     }
     return blocks;
-  }
+  };
 
   return (
     <Game>
       <Board>
-        <DummyPlaceholder
+        <LayoutStretcher
           width={horizontalBlocks * blockWidth}
           height={verticalBlocks * blockHeight}
         />
-        <BoardGridWrapper width={horizontalBlocks}>
-          {drawBlocks()}
-        </BoardGridWrapper>
+        <BlockWrapper width={horizontalBlocks}>{renderBlocks()}</BlockWrapper>
       </Board>
-      <ElementPreview setHover={handleHover} />
-      <div> Score: {score}</div>
+      <Sidebar>
+        <Score>
+          SCORE<p>{score}</p>
+        </Score>
+        <ElementsWrapper itemCount={dragElements.length}>
+          <CustomDragLayer elements={dragElements} />
+          {dragElements.map((element, index) => (
+            <DragElement
+              key={index}
+              index={index}
+              element={element}
+              setHover={hoverElement}
+            />
+          ))}
+        </ElementsWrapper>
+      </Sidebar>
     </Game>
   );
 };

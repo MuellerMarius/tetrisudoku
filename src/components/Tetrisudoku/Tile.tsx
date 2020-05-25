@@ -1,31 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useDrop } from 'react-dnd';
 import * as Cst from '../../constants';
 
-type Props = {
+//
+// Types
+//
+
+type TileProps = {
   x: number;
   y: number;
-  state: number;
+  value: number;
   hover: number;
-  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  onHover: (x: number, y: number, element: ElemCoord[]) => void;
-  onDrop: (x: number, y: number, element: ElemCoord[]) => void;
-  canDrop: (x: number, y: number, element: ElemCoord[]) => boolean;
+  onHover: (x: number, y: number, index: number) => void;
+  onDrop: (x: number, y: number, index: number) => void;
+  canDrop: (x: number, y: number, index: number) => boolean;
 };
 
-type WrapperProps = {
-  state: number;
+type TileWrapperProps = {
+  value: number;
 };
 
 type HoverProps = {
   isDroppable: boolean;
 };
 
-const TileWrapper = styled.div<WrapperProps>`
+//
+// Styles
+//
+
+const TileWrapper = styled.div<TileWrapperProps>`
   width: 100%;
   height: 100%;
-  background-color: ${({ state }) => Cst.BLOCK_COLORS[state]};
+  transform: translateZ(0);
+  background-color: ${({ value }) => Cst.BLOCK_COLORS[value]};
+  transition: background-color 0.4s ease-in-out;
 `;
 
 const HoverOverlay = styled.div<HoverProps>`
@@ -34,31 +43,37 @@ const HoverOverlay = styled.div<HoverProps>`
   height: 100%;
   z-index: 1;
   background-color: ${({ isDroppable }) =>
-    isDroppable ? 'rgba(209, 46, 46,0.4)' : 'rgba(57, 209, 46,0.4)'};
+    isDroppable
+      ? Cst.BLOCK_HOVER_COLOR_DROPPABLE
+      : Cst.BLOCK_HOVER_COLOR_NOT_DROPPABLE};
 `;
 
-const Tile: React.FC<Props> = (props) => {
+//
+// Functions
+//
+
+const Tile: React.FC<TileProps> = (props) => {
   const [{ isOver }, drop] = useDrop({
     accept: Cst.TYPE_ELEMENT,
     drop: (item: dragItem) => {
-      props.onDrop(props.x, props.y, item.element);
+      props.onDrop(props.x, props.y, item.index);
     },
     hover: (item: dragItem) => {
-      hover(item.element);
+      hover(item.index);
     },
-    canDrop: (item, monitor) => props.canDrop(props.x, props.y, item.element),
+    canDrop: (item) => props.canDrop(props.x, props.y, item.index),
     collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+      isOver: monitor.isOver(),
     }),
   });
 
-  const hover = (element: ElemCoord[]) => {
-    !isOver && props.onHover(props.x, props.y, element);
+  const hover = (index: number) => {
+    !isOver && props.onHover(props.x, props.y, index);
   };
 
   return (
-    <TileWrapper state={props.state} ref={drop}>
-      {props.hover !== 0 && <HoverOverlay isDroppable={props.hover < 0} />}
+    <TileWrapper value={props.value} ref={drop}>
+      {props.hover !== 0 && <HoverOverlay isDroppable={props.hover >= 0} />}
     </TileWrapper>
   );
 };

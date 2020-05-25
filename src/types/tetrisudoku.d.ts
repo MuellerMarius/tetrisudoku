@@ -10,6 +10,6 @@ type WrapperProps = {
 };
 
 type dragItem = {
-  type: any;
-  element: ElemCoord[];
+  type: string;
+  index: number;
 };
