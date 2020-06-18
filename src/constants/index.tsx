@@ -2,7 +2,6 @@ export const DEFAULT_HORIZONTAL_BLOCKS = 3;
 export const DEFAULT_VERTICAL_BLOCKS = 3;
 export const DEFAULT_BLOCK_WIDTH = 3;
 export const DEFAULT_BLOCK_HEIGHT = 3;
-// export const BLOCK_COLORS = ['#def4f0', '#74d4c0', '#d9455f', '#9a1f40'];
 export const PREV_ELEMENT_BLOCK_SIZE = {
   small: 35,
   medium: 45,
@@ -16,16 +15,6 @@ export const BLOCK_HOVER_COLOR_DROPPABLE = '#cae8d5';
 export const BLOCK_HOVER_COLOR_NOT_DROPPABLE = 'rgba(209, 46, 46,0.4)';
 export const TYPE_ELEMENT = 'element';
 export const ELEMENTS = [
-  [
-    // long z
-    { x: -2, y: -1, val: 1 },
-    { x: -1, y: -1, val: 1 },
-    { x: 0, y: -1, val: 1 },
-    { x: 0, y: 0, val: 1 },
-    { x: 0, y: 1, val: 1 },
-    { x: 1, y: 1, val: 1 },
-    { x: 2, y: 1, val: 1 },
-  ],
   [
     // z
     { x: -1, y: -1, val: 1 },
@@ -104,6 +93,20 @@ export const ELEMENTS = [
     { x: 0, y: 0, val: 1 },
     { x: 1, y: 0, val: 1 },
     { x: 0, y: 1, val: 1 },
+  ],
+  [
+    // T rotated 90°
+    { x: -1, y: 0, val: 1 },
+    { x: 0, y: 1, val: 1 },
+    { x: 0, y: 0, val: 1 },
+    { x: 0, y: -1, val: 1 },
+  ],
+  [
+    // T rotated 270°
+    { x: 1, y: 0, val: 1 },
+    { x: 0, y: 1, val: 1 },
+    { x: 0, y: 0, val: 1 },
+    { x: 0, y: -1, val: 1 },
   ],
   [
     // simple block

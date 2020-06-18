@@ -4,6 +4,7 @@ import { ScoreAnimation } from './ScoreAnimation';
 import CustomDragLayer from './CustomDragLayer';
 import DragElement from './DragElement';
 import Tile from './Tile';
+import InfoBox from './InfoBox';
 import * as Cst from '../../constants';
 
 //
@@ -38,7 +39,7 @@ declare global {
 
 const Game = styled.div`
   position: relative;
-  width: 85%;
+  width: 75%;
   left: 7.5%;
   display: grid;
   grid-template-columns: 80% 20%;
@@ -47,6 +48,11 @@ const Game = styled.div`
   @media (min-width: 1200px) {
     width: 65%;
     left: 17.5%;
+  } 
+
+  @media (min-width: 1600px) {
+    width: 55%;
+    left: 22.5%;
   }
 `;
 
@@ -389,6 +395,7 @@ export const Tetrisudoku: React.FC<TetrissudokuProps> = ({
 
   return (
     <Game>
+      <InfoBox />
       <Board>
         <LayoutStretcher
           width={horizontalBlocks * blockWidth}

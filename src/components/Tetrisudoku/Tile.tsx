@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import { useDrop } from 'react-dnd';
 import * as Cst from '../../constants';
 
@@ -76,6 +77,16 @@ const Tile: React.FC<TileProps> = (props) => {
       {props.hover !== 0 && <HoverOverlay isDroppable={props.hover >= 0} />}
     </TileWrapper>
   );
+};
+
+Tile.propTypes = {
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+  hover: PropTypes.number.isRequired,
+  onHover: PropTypes.func.isRequired,
+  onDrop: PropTypes.func.isRequired,
+  canDrop: PropTypes.func.isRequired,
 };
 
 export default React.memo(Tile);

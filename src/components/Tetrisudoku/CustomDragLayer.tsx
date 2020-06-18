@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { XYCoord, useDragLayer } from 'react-dnd';
 import styled from 'styled-components';
 import Element from './Element';
@@ -57,4 +58,9 @@ const CustomDragLayer: React.FC<CustomDragLayerProps> = (props) => {
     </DragWrapper>
   );
 };
+
+CustomDragLayer.propTypes = {
+  elements: PropTypes.array.isRequired,
+};
+
 export default React.memo(CustomDragLayer);

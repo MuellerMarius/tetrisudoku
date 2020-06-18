@@ -166,11 +166,11 @@ const DragElement: React.FC<ElementProps> = (props) => {
   );
 };
 
-// TODO: proptypes
-// DragElement.propTypes = {
-//   // element: ElemCoord[];
-//   isDragging: PropTypes.boolean.isRequired;
-//   // drag?: DragElementWrapper<DragSourceOptions>;
-//   // isDragPreview?: boolean;
-// };
+DragElement.propTypes = {
+  element: PropTypes.array.isRequired,
+  isDragging: PropTypes.bool.isRequired,
+  drag: PropTypes.func,
+  isDragPreview: PropTypes.bool,
+};
+
 export default React.memo(DragElement);
