@@ -131,11 +131,7 @@ const DragElement: React.FC<ElementProps> = (props) => {
   }, [element]);
 
   return isDragPreview ? (
-    <DragGrid
-      width={maxValues.x - minValues.x + 1}
-      center={minValues}
-      ref={drag}
-    >
+    <DragGrid width={maxValues.x - minValues.x + 1} center={minValues}>
       {element.map((elemCoord, i) => (
         <DragGridElement
           key={i}

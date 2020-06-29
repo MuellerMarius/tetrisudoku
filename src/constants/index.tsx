@@ -8,7 +8,7 @@ export const PREV_ELEMENT_BLOCK_SIZE = {
   large: 50,
   xlarge: 60,
 };
-export const BOARD_BG_COLOR = '#ddd';
+export const BOARD_BG_COLOR = '#D9DCE2';
 export const BLOCK_COLORS = ['#fefefe', '#84a9ac', '#3b6978', '#204051'];
 export const BLOCK_BORDER_COLOR = '#74d8c2';
 export const BLOCK_HOVER_COLOR_DROPPABLE = '#cae8d5';

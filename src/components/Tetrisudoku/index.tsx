@@ -4,7 +4,6 @@ import { ScoreAnimation } from './ScoreAnimation';
 import CustomDragLayer from './CustomDragLayer';
 import DragElement from './DragElement';
 import Tile from './Tile';
-import InfoBox from './InfoBox';
 import * as Cst from '../../constants';
 
 //
@@ -39,16 +38,17 @@ declare global {
 
 const Game = styled.div`
   position: relative;
-  width: 75%;
+  top: 10px;
+  width: 85%;
   left: 7.5%;
   display: grid;
   grid-template-columns: 80% 20%;
-  grid-column-gap: 7px;
 
   @media (min-width: 1200px) {
+    top: 25px;
     width: 65%;
     left: 17.5%;
-  } 
+  }
 
   @media (min-width: 1600px) {
     width: 55%;
@@ -57,23 +57,58 @@ const Game = styled.div`
 `;
 
 const Board = styled.div`
+  -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.35);
+  -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.35);
+  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.35);
   display: inline-block;
   position: relative;
   width: 100%;
   grid-column: 1 / 2;
+  z-index: 1;
+
   @media (max-width: 768px) {
     grid-column: 1 / 3;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.35);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.35);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.35);
   }
 `;
 
 const Sidebar = styled.div`
   position: relative;
   width: 100%;
+  height: 94%;
+  top: 3%;
   background-color: ${Cst.BOARD_BG_COLOR};
+  border-radius: 0 15px 15px 0;
 
   @media (max-width: 768px) {
-    margin-top: 5px;
+    width: 90%;
+    left: 5%;
+    top: 0;
+    height: 100%;
     grid-column: 1 / 3;
+    border-radius: 0 0 8px 8px;
+    padding: 7px;
+  }
+`;
+
+const TopBar = styled.div`
+  width: 40%;
+  height: 100%;
+  left: 30%;
+  position: relative;
+  grid-column: 1 / 3;
+  grid-row: 1;
+  background-color: ${Cst.BOARD_BG_COLOR};
+  border-radius: 8px 8px 0 0;
+  color: #555;
+  padding: 5px 25px 5px 25px;
+  font-size: 14pt;
+  z-index: 0;
+
+  @media (min-width: 769px) {
+    display: none;
   }
 `;
 
@@ -87,16 +122,35 @@ const Score = styled.div`
     margin-top: 10px;
     font-size: 25pt;
 
+    @media (max-width: 768px) {
+      margin-top: 0;
+      font-size: 18pt;
+    }
+
     @media (min-width: 992px) {
       font-size: 40pt;
     }
   }
 `;
 
+const SideScore = styled(Score)`
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const TopScore = styled(Score)`
+  margin-top: 0;
+  font-size: 11pt;
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
 const ElementsWrapper = styled.div<ElementsWrapperProps>`
   position: relative;
   width: 100%;
-  height: 80%;
   display: grid;
 
   @media (max-width: 768px) {
@@ -105,7 +159,8 @@ const ElementsWrapper = styled.div<ElementsWrapperProps>`
     min-height: 125px;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 769px) {
+    height: 80%;
     grid-template-rows: repeat(${({ itemCount }) => itemCount}, 1fr);
     grid-row-gap: 10px;
     justify-content: center;
@@ -395,7 +450,11 @@ export const Tetrisudoku: React.FC<TetrissudokuProps> = ({
 
   return (
     <Game>
-      <InfoBox />
+      <TopBar>
+        <TopScore>
+          SCORE<p>{score}</p>
+        </TopScore>
+      </TopBar>
       <Board>
         <LayoutStretcher
           width={horizontalBlocks * blockWidth}
@@ -404,9 +463,9 @@ export const Tetrisudoku: React.FC<TetrissudokuProps> = ({
         <BlockWrapper width={horizontalBlocks}>{renderBlocks()}</BlockWrapper>
       </Board>
       <Sidebar>
-        <Score>
+        <SideScore>
           SCORE<p>{score}</p>
-        </Score>
+        </SideScore>
         <ElementsWrapper itemCount={dragElements.length}>
           <CustomDragLayer elements={dragElements} />
           {dragElements.map((element, index) => (
