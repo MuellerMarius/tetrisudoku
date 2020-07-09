@@ -1,37 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { DragElementWrapper, DragSourceOptions } from 'react-dnd';
 import * as Cst from '../../constants';
 
-//
-// Types
-//
-
-type ElementProps = {
-  element: ElemCoord[];
-  isDragging: boolean;
-  drag?: DragElementWrapper<DragSourceOptions>;
-  isDragPreview?: boolean;
+const DRAG_ELEMENT_BLOCK_SIZE = {
+  small: 35,
+  medium: 45,
+  large: 50,
+  xlarge: 60,
 };
 
-type MinMax = {
-  x: number;
-  y: number;
+const PREV_ELEMENT_BLOCK_SIZE = {
+  small: 22,
+  medium: 30,
+  large: 40,
 };
-
-type GridProps = WrapperProps & {
-  isDragPreview?: boolean;
-  center: MinMax;
-};
-
-type GridElementProps = ElemCoord & {
-  isDragging: boolean;
-};
-
-//
-// Styles
-//
 
 const Grid = styled.div<GridProps>`
   display: grid;
@@ -47,26 +30,26 @@ const DragGrid = styled(Grid)`
   grid-column-gap: 10px;
   margin: inherit;
 
-  left: ${({ center }) => center.x * Cst.PREV_ELEMENT_BLOCK_SIZE['xlarge']}px;
-  top: ${({ center }) => center.y * Cst.PREV_ELEMENT_BLOCK_SIZE['xlarge']}px;
-  width: ${({ width }) => width * Cst.PREV_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
 
   @media (max-width: 1200px) {
-    left: ${({ center }) => center.x * Cst.PREV_ELEMENT_BLOCK_SIZE['large']}px;
-    top: ${({ center }) => center.y * Cst.PREV_ELEMENT_BLOCK_SIZE['large']}px;
-    width: ${({ width }) => width * Cst.PREV_ELEMENT_BLOCK_SIZE['large']}px;
+    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['large']}px;
+    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['large']}px;
+    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['large']}px;
   }
 
   @media (max-width: 992px) {
-    left: ${({ center }) => center.x * Cst.PREV_ELEMENT_BLOCK_SIZE['medium']}px;
-    top: ${({ center }) => center.y * Cst.PREV_ELEMENT_BLOCK_SIZE['medium']}px;
-    width: ${({ width }) => width * Cst.PREV_ELEMENT_BLOCK_SIZE['medium']}px;
+    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
+    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
+    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
   }
 
   @media (max-width: 576px) {
-    left: ${({ center }) => center.x * Cst.PREV_ELEMENT_BLOCK_SIZE['small']}px;
-    top: ${({ center }) => center.y * Cst.PREV_ELEMENT_BLOCK_SIZE['small']}px;
-    width: ${({ width }) => width * Cst.PREV_ELEMENT_BLOCK_SIZE['small']}px;
+    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['small']}px;
+    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['small']}px;
+    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['small']}px;
   }
 `;
 
@@ -78,35 +61,39 @@ const GridElement = styled.div<GridElementProps>`
   padding-top: 100%;
   opacity: ${({ isDragging }) => (isDragging ? 0.3 : 1)};
   transition: opacity 0.2s ease-in-out;
-  width: 40px;
+  width: ${PREV_ELEMENT_BLOCK_SIZE['large']}px;
 
-  @media (max-width: 1200px) {
-    width: 25px;
+  @media (max-width: 1350px) {
+    width: ${PREV_ELEMENT_BLOCK_SIZE['medium']}px;
+  }
+
+  @media (max-width: 764px) {
+    width: ${PREV_ELEMENT_BLOCK_SIZE['small']}px;
   }
 `;
 
 const DragGridElement = styled(GridElement)`
   opacity: 1;
-  width: ${Cst.PREV_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  width: ${DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  height: ${DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
 
   @media (max-width: 1200px) {
-    width: ${Cst.PREV_ELEMENT_BLOCK_SIZE['large']}px;
+    width: ${DRAG_ELEMENT_BLOCK_SIZE['large']}px;
+    height: ${DRAG_ELEMENT_BLOCK_SIZE['large']}px;
   }
 
   @media (max-width: 992px) {
-    width: ${Cst.PREV_ELEMENT_BLOCK_SIZE['medium']}px;
+    width: ${DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
+    height: ${DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
   }
 
   @media (max-width: 576px) {
-    width: ${Cst.PREV_ELEMENT_BLOCK_SIZE['small']}px;
+    width: ${DRAG_ELEMENT_BLOCK_SIZE['small']}px;
+    height: ${DRAG_ELEMENT_BLOCK_SIZE['small']}px;
   }
 `;
 
-//
-// Functions
-//
-
-const DragElement: React.FC<ElementProps> = (props) => {
+const Element: React.FC<ElementProps> = (props) => {
   const { element, drag, isDragging, isDragPreview } = props;
   const [maxValues, setMaxValues] = useState<MinMax>({ x: 0, y: 0 });
   const [minValues, setMinValues] = useState<MinMax>({ x: 0, y: 0 });
@@ -143,12 +130,7 @@ const DragElement: React.FC<ElementProps> = (props) => {
       ))}
     </DragGrid>
   ) : (
-    <Grid
-      width={maxValues.x - minValues.x + 1}
-      isDragPreview={isDragPreview}
-      center={minValues}
-      ref={drag}
-    >
+    <Grid width={maxValues.x - minValues.x + 1} center={minValues} ref={drag}>
       {element.map((elemCoord, i) => (
         <GridElement
           key={i}
@@ -162,11 +144,11 @@ const DragElement: React.FC<ElementProps> = (props) => {
   );
 };
 
-DragElement.propTypes = {
+Element.propTypes = {
   element: PropTypes.array.isRequired,
   isDragging: PropTypes.bool.isRequired,
   drag: PropTypes.func,
   isDragPreview: PropTypes.bool,
 };
 
-export default React.memo(DragElement);
+export default React.memo(Element);

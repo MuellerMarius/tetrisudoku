@@ -1,19 +1,19 @@
-export const DEFAULT_HORIZONTAL_BLOCKS = 3;
-export const DEFAULT_VERTICAL_BLOCKS = 3;
-export const DEFAULT_BLOCK_WIDTH = 3;
-export const DEFAULT_BLOCK_HEIGHT = 3;
-export const PREV_ELEMENT_BLOCK_SIZE = {
-  small: 35,
-  medium: 45,
-  large: 50,
-  xlarge: 60,
-};
+// Game
+export const HORIZONTAL_BLOCKS = 3;
+export const VERTICAL_BLOCKS = 3;
+export const BLOCK_WIDTH = 3;
+export const BLOCK_HEIGHT = 3;
+export const DRAG_ELEMENTS_COUNT = 3;
+
+// Colors
 export const BOARD_BG_COLOR = '#D9DCE2';
-export const BLOCK_COLORS = ['#fefefe', '#84a9ac', '#3b6978', '#204051'];
-export const BLOCK_BORDER_COLOR = '#74d8c2';
-export const BLOCK_HOVER_COLOR_DROPPABLE = '#cae8d5';
-export const BLOCK_HOVER_COLOR_NOT_DROPPABLE = 'rgba(209, 46, 46,0.4)';
-export const TYPE_ELEMENT = 'element';
+export const BLOCK_COLORS = ['#FEFEFE', '#84A9AC', '#3B6978', '#204051'];
+export const BLOCK_BORDER_COLOR = '#74D8C2';
+export const BLOCK_HOVER_COLOR_DROPPABLE = '#CAE8D5';
+export const BLOCK_HOVER_COLOR_NOT_DROPPABLE = 'rgba(209, 46, 46, 0.4)';
+
+// Elements
+export const TYPE_ELEMENT = 'ELEMENT';
 export const ELEMENTS = [
   [
     // z
@@ -122,13 +122,4 @@ export const ELEMENTS = [
     { x: 0, y: 0, val: 1 },
     { x: 1, y: 0, val: 1 },
   ],
-];
-export const SAMPLE_ELEMENT = [
-  { x: -2, y: -1, val: 1 },
-  { x: -1, y: -1, val: 1 },
-  { x: 0, y: -1, val: 1 },
-  { x: 0, y: 0, val: 1 },
-  { x: 0, y: 1, val: 1 },
-  { x: 1, y: 1, val: 1 },
-  { x: 2, y: 1, val: 1 },
 ];

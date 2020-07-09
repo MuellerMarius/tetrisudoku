@@ -1,12 +1,5 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import {
-  DndProvider,
-  TouchTransition,
-  MouseTransition,
-} from 'react-dnd-multi-backend';
-import TouchBackend from 'react-dnd-touch-backend';
-import Backend from 'react-dnd-html5-backend';
 import { createGlobalStyle } from 'styled-components';
 import { Tetrisudoku } from './components/Tetrisudoku';
 import InfoText from './InfoText';
@@ -17,18 +10,20 @@ const GlobalStyle = createGlobalStyle`
     background: linear-gradient(0deg, rgba(254,254,254,1) 60%, rgba(20,40,51,0.75) 60%);
     background-repeat: no-repeat;
     font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12pt;
     color: #323232;
 
     @media (max-width: 700px) {
       background: #fefefe;  
-      background: linear-gradient(0deg, rgba(254,254,254,1) 65%, rgba(20,40,51,0.75) 65%);
+      background: linear-gradient(0deg, rgba(254,254,254,1) 70%, rgba(20,40,51,0.75) 70%);
       background-repeat: no-repeat;
     }
 
     @media (max-width: 400px) {
       background: #fefefe;  
-      background: linear-gradient(0deg, rgba(254,254,254,1) 90%, rgba(20,40,51,0.75) 90%);
+      background: linear-gradient(0deg, rgba(254,254,254,1) 80%, rgba(20,40,51,0.75) 80%);
       background-repeat: no-repeat;
+      font-size: 11pt;
     }
   }
   * {
@@ -36,28 +31,13 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const HTML5toTouch = {
-  backends: [
-    {
-      backend: Backend,
-      transition: MouseTransition,
-    },
-    {
-      backend: TouchBackend,
-      options: { enableMouseEvents: true },
-      preview: true,
-      transition: TouchTransition,
-    },
-  ],
-};
-
 function App() {
   return (
-    <DndProvider options={HTML5toTouch}>
+    <main>
       <GlobalStyle />
       <Tetrisudoku />
       <InfoText />
-    </DndProvider>
+    </main>
   );
 }
 
