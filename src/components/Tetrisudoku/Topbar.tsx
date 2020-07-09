@@ -12,7 +12,7 @@ const TopbarWrapper = styled.div`
   grid-column: 1 / 3;
   grid-row: 1;
   background-color: ${Cst.BOARD_BG_COLOR};
-  border-radius: 8px 8px 0 0;
+  border-radius: 5px 5px 0 0;
   color: #555;
   padding: 5px 25px 5px 25px;
   font-size: 14pt;

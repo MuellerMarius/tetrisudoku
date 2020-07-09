@@ -13,8 +13,16 @@ const TileWrapper = styled.div<TileWrapperProps>`
   transition: background-color 0.4s ease-in-out;
 `;
 
+const LayoutStretcher = styled.div`
+  display: relative;
+  margin-top: 100%;
+  bottom: 0;
+  z-index: -1;
+`;
+
 const HoverOverlay = styled.div<TileHoverProps>`
   position: relative;
+  top: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
@@ -47,6 +55,7 @@ const BoardTile: React.FC<BoardTileProps> = (props) => {
   return (
     <TileWrapper value={board[props.y][props.x]} ref={drop}>
       {props.hover !== 0 && <HoverOverlay isDroppable={props.hover >= 0} />}
+      <LayoutStretcher />
     </TileWrapper>
   );
 };

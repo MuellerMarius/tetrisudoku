@@ -13,7 +13,7 @@ const SidebarWrapper = styled.div`
   margin-top: auto;
   margin-bottom: auto;
   background-color: ${Cst.BOARD_BG_COLOR};
-  border-radius: 0 15px 15px 0;
+  border-radius: 0 10px 10px 0;
 
   @media (max-width: 768px) {
     width: 90%;
@@ -21,7 +21,7 @@ const SidebarWrapper = styled.div`
     top: 0;
     height: 100%;
     grid-column: 1 / 3;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 5px 5px;
     padding: 7px;
   }
 `;
