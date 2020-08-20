@@ -67,10 +67,14 @@ export const GameContext = createContext<GameContextProps>(
 );
 
 export const GameContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(GameReducer, getInitialState());
-  const [firedScoreAnimation, fireScoreAnimation] = useState<FiredScoreAnimation>(
-    {} as FiredScoreAnimation
+  const localState = JSON.parse(localStorage.getItem('gameState'));
+  const [state, dispatch] = useReducer(
+    GameReducer,
+    localState || getInitialState()
   );
+  const [firedScoreAnimation, fireScoreAnimation] = useState<
+    FiredScoreAnimation
+  >({} as FiredScoreAnimation);
 
   useEffect(() => {
     let blockWasCleared = false;
@@ -92,6 +96,10 @@ export const GameContextProvider = ({ children }) => {
       clearDraggableElements();
       alert('Game over!');
     }
+  }, [state]);
+
+  useEffect(() => {
+    localStorage.setItem('gameState', JSON.stringify(state));
   }, [state]);
 
   const dropElement = useCallback(
