@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import { createGlobalStyle } from 'styled-components';
 import { Tetrisudoku } from './components/Tetrisudoku';
 import InfoText from './InfoText';
+import * as serviceWorker from './serviceWorker';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -43,3 +44,4 @@ function App() {
 
 const rootElement = document.getElementById('root');
 render(<App />, rootElement);
+serviceWorker.register();
