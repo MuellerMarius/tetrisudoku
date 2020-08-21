@@ -9,7 +9,7 @@ import * as Cst from '../../constants';
 const SidebarWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 94%;
+  height: 97%;
   margin-top: auto;
   margin-bottom: auto;
   background-color: ${Cst.BOARD_BG_COLOR};
