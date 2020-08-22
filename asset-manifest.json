@@ -1,11 +1,11 @@
 {
-  "main.js": "/tetrisudoku/static/js/main.80ff36da.chunk.js",
-  "main.js.map": "/tetrisudoku/static/js/main.80ff36da.chunk.js.map",
+  "main.js": "/tetrisudoku/static/js/main.0cc05395.chunk.js",
+  "main.js.map": "/tetrisudoku/static/js/main.0cc05395.chunk.js.map",
   "static/js/1.7a56ceaa.chunk.js": "/tetrisudoku/static/js/1.7a56ceaa.chunk.js",
   "static/js/1.7a56ceaa.chunk.js.map": "/tetrisudoku/static/js/1.7a56ceaa.chunk.js.map",
   "runtime~main.js": "/tetrisudoku/static/js/runtime~main.b1a0ebb6.js",
   "runtime~main.js.map": "/tetrisudoku/static/js/runtime~main.b1a0ebb6.js.map",
   "index.html": "/tetrisudoku/index.html",
-  "precache-manifest.d98cb980c9b0ceb25fb50f14c992fdb4.js": "/tetrisudoku/precache-manifest.d98cb980c9b0ceb25fb50f14c992fdb4.js",
+  "precache-manifest.7cc2f25e80c4514223b34db4f7212479.js": "/tetrisudoku/precache-manifest.7cc2f25e80c4514223b34db4f7212479.js",
   "service-worker.js": "/tetrisudoku/service-worker.js"
 }

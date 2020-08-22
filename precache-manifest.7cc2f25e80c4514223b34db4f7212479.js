@@ -1,7 +1,7 @@
 self.__precacheManifest = [
   {
-    "revision": "80ff36da0b58989774af",
-    "url": "/tetrisudoku/static/js/main.80ff36da.chunk.js"
+    "revision": "0cc05395966756a157dd",
+    "url": "/tetrisudoku/static/js/main.0cc05395.chunk.js"
   },
   {
     "revision": "7a56ceaa52c340f4b3e9",
@@ -12,7 +12,7 @@ self.__precacheManifest = [
     "url": "/tetrisudoku/static/js/runtime~main.b1a0ebb6.js"
   },
   {
-    "revision": "bbf20ead52ce3535d3483656ea3df0d7",
+    "revision": "c775708ad903a1a259c96d205bc3a1e9",
     "url": "/tetrisudoku/index.html"
   }
 ];
