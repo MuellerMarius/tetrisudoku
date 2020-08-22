@@ -102,6 +102,13 @@ export const GameContextProvider = ({ children }) => {
     localStorage.setItem('gameState', JSON.stringify(state));
   }, [state]);
 
+  const resetGame = useCallback(() => {
+    dispatch({
+      type: actionType.UPDATE,
+      payload: getInitialState(),
+    });
+  }, []);
+
   const dropElement = useCallback(
     (x: number, y: number, index: number) => {
       const tempBoard = state.board.deepClone();
@@ -221,6 +228,7 @@ export const GameContextProvider = ({ children }) => {
       dropElement,
       clearDraggableElements,
       canElementBeDropped,
+      resetGame,
     };
   }, [
     state,

@@ -43,6 +43,31 @@ const Block = styled.div`
   grid-column-gap: 1px;
 `;
 
+const ResetButton = styled.button`
+  cursor: pointer;
+  grid-column: 1 / 3;
+  width: 100%;
+  margin-top: 25px;
+  padding: 13px;
+  background-color: rgb(254, 254, 254);
+  border: solid 1px #8c95a6;
+  color: #8c95a6;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  font-weight: 600;
+
+  &:hover {
+    background-color: #84a9ac;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    left: 5%;
+    width: 90%;
+  }
+`;
+
 export const Game: React.FC = () => {
   const initialAnimState = Array(
     Cst.HORIZONTAL_BLOCKS * Cst.VERTICAL_BLOCKS
@@ -50,9 +75,12 @@ export const Game: React.FC = () => {
 
   const [hoverState, setHoverState] = useState<number[][]>(getEmptyBoard());
   const [scoreAnimations, setScoreAnim] = useState<number[]>(initialAnimState);
-  const { board, draggableElements, firedScoreAnimation } = useContext(
-    GameContext
-  );
+  const {
+    board,
+    draggableElements,
+    firedScoreAnimation,
+    resetGame,
+  } = useContext(GameContext);
 
   useEffect(() => {
     setScoreAnim((scoreAnimations) =>
@@ -65,6 +93,12 @@ export const Game: React.FC = () => {
       )
     );
   }, [firedScoreAnimation]);
+
+  const confirmReset = useCallback(() => {
+    if (confirm('Do you really want to start a new game?')) {
+      resetGame();
+    }
+  }, []);
 
   const hoverElement = useCallback(
     (x: number, y: number, index: number) => {
@@ -147,6 +181,7 @@ export const Game: React.FC = () => {
       <Topbar />
       <Board>{renderBlocks()}</Board>
       <Sidebar setHover={hoverElement} />
+      <ResetButton onClick={() => confirmReset()}>Reset Game</ResetButton>
     </GameWrapper>
   );
 };

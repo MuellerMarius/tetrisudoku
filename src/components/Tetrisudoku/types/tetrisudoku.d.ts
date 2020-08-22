@@ -40,6 +40,7 @@ type GameContextProps = StateObject & {
   dropElement: (x: number, y: number, index: number) => void;
   clearDraggableElements: () => void;
   canElementBeDropped: (x: number, y: number, index: number) => boolean;
+  resetGame: () => void;
 };
 
 type WrapperProps = {
