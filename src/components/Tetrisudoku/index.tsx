@@ -7,7 +7,7 @@ import {
 import TouchBackend from 'react-dnd-touch-backend';
 import Backend from 'react-dnd-html5-backend';
 import { GameContextProvider } from './context/GameState';
-import { Game } from './Game';
+import Game from './Game';
 
 const HTML5toTouch = {
   backends: [
@@ -24,12 +24,12 @@ const HTML5toTouch = {
   ],
 };
 
-export const Tetrisudoku: React.FC = () => {
-  return (
-    <DndProvider options={HTML5toTouch}>
-      <GameContextProvider>
-        <Game />
-      </GameContextProvider>
-    </DndProvider>
-  );
-};
+const Tetrisudoku: React.FC = () => (
+  <DndProvider options={HTML5toTouch}>
+    <GameContextProvider>
+      <Game />
+    </GameContextProvider>
+  </DndProvider>
+);
+
+export default Tetrisudoku;

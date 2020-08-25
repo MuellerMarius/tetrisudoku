@@ -39,7 +39,8 @@ const Topbar: React.FC = () => {
   return (
     <TopbarWrapper>
       <TopScore>
-        SCORE<p>{score}</p>
+        SCORE
+        <p>{score}</p>
       </TopScore>
     </TopbarWrapper>
   );

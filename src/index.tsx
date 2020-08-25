@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { createGlobalStyle } from 'styled-components';
-import { Tetrisudoku } from './components/Tetrisudoku';
+import Tetrisudoku from './components/Tetrisudoku';
 import InfoText from './InfoText';
 import * as serviceWorker from './serviceWorker';
 
@@ -32,15 +32,13 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-function App() {
-  return (
-    <main>
-      <GlobalStyle />
-      <Tetrisudoku />
-      <InfoText />
-    </main>
-  );
-}
+const App = () => (
+  <main>
+    <GlobalStyle />
+    <Tetrisudoku />
+    <InfoText />
+  </main>
+);
 
 const rootElement = document.getElementById('root');
 render(<App />, rootElement);

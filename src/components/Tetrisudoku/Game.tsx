@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { GameContext, getEmptyBoard, iterateBlock } from './context/GameState';
-import { ScoreAnimation } from './ScoreAnimation';
+import ScoreAnimation from './ScoreAnimation';
 import Board from './Board';
 import BoardTile from './BoardTile';
 import Sidebar from './Sidebar';
@@ -68,9 +68,9 @@ const ResetButton = styled.button`
   }
 `;
 
-export const Game: React.FC = () => {
+const Game: React.FC = () => {
   const initialAnimState = Array(
-    Cst.HORIZONTAL_BLOCKS * Cst.VERTICAL_BLOCKS
+    Cst.HORIZONTAL_BLOCKS * Cst.VERTICAL_BLOCKS,
   ).fill(0);
 
   const [hoverState, setHoverState] = useState<number[][]>(getEmptyBoard());
@@ -89,8 +89,8 @@ export const Game: React.FC = () => {
         firedScoreAnimation.yBlock * Cst.HORIZONTAL_BLOCKS +
           firedScoreAnimation.xBlock
           ? firedScoreAnimation.addScore
-          : elem
-      )
+          : elem,
+      ),
     );
   }, [firedScoreAnimation]);
 
@@ -122,13 +122,13 @@ export const Game: React.FC = () => {
 
       if (!canBeDropped) {
         tempState = tempState.map((row) =>
-          row.map((item) => (item !== 0 ? item * -1 : 0))
+          row.map((item) => (item !== 0 ? item * -1 : 0)),
         );
       }
 
       setHoverState(tempState);
     },
-    [board, draggableElements]
+    [board, draggableElements],
   );
 
   const renderBlock = useCallback(
@@ -143,7 +143,7 @@ export const Game: React.FC = () => {
             y={y}
             hover={hoverState[y][x]}
             onHover={hoverElement}
-          />
+          />,
         );
       });
 
@@ -155,7 +155,7 @@ export const Game: React.FC = () => {
               score={scoreAnimations[index]}
               onAnimationEnd={() =>
                 setScoreAnim((scoreAnimations) =>
-                  scoreAnimations.map((elem, i) => (i === index ? 0 : elem))
+                  scoreAnimations.map((elem, i) => (i === index ? 0 : elem)),
                 )
               }
             />
@@ -163,13 +163,13 @@ export const Game: React.FC = () => {
         </Block>
       );
     },
-    [hoverState, hoverElement, scoreAnimations]
+    [hoverState, hoverElement, scoreAnimations],
   );
 
   const renderBlocks = useCallback(() => {
     const blocks: ReactChild[] = [];
-    for (let y = 0; y < Cst.VERTICAL_BLOCKS; y++) {
-      for (let x = 0; x < Cst.HORIZONTAL_BLOCKS; x++) {
+    for (let y = 0; y < Cst.VERTICAL_BLOCKS; y += 1) {
+      for (let x = 0; x < Cst.HORIZONTAL_BLOCKS; x += 1) {
         blocks.push(renderBlock(x, y));
       }
     }
@@ -185,3 +185,5 @@ export const Game: React.FC = () => {
     </GameWrapper>
   );
 };
+
+export default Game;

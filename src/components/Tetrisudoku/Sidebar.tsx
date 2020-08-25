@@ -83,7 +83,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   return (
     <SidebarWrapper>
       <SideScore>
-        SCORE<p>{score}</p>
+        SCORE
+        <p>{score}</p>
       </SideScore>
       <ElementsWrapper>
         <DragPreview />

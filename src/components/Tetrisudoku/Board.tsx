@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Cst from '../../constants';
 
@@ -35,18 +36,14 @@ const LayoutStretcher = styled.div<WrapperProps>`
   bottom: 0;
 `;
 
-const Board: React.FC<BoardProps> = (props) => {
-  return (
-    <BoardWrapper>
-      <LayoutStretcher
-        width={Cst.HORIZONTAL_BLOCKS * Cst.BLOCK_WIDTH}
-        height={Cst.VERTICAL_BLOCKS * Cst.BLOCK_HEIGHT}
-      />
-      <BlockWrapper width={Cst.HORIZONTAL_BLOCKS}>
-        {props.children}
-      </BlockWrapper>
-    </BoardWrapper>
-  );
-};
+const Board: React.FC<BoardProps> = ({ children }) => (
+  <BoardWrapper>
+    <LayoutStretcher
+      width={Cst.HORIZONTAL_BLOCKS * Cst.BLOCK_WIDTH}
+      height={Cst.VERTICAL_BLOCKS * Cst.BLOCK_HEIGHT}
+    />
+    <BlockWrapper width={Cst.HORIZONTAL_BLOCKS}>{children}</BlockWrapper>
+  </BoardWrapper>
+);
 
 export default React.memo(Board);

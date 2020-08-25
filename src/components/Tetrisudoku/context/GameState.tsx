@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import PropTypes from 'prop-types';
 import GameReducer from './GameReducer';
 import * as actionType from './actions';
 import * as Cst from '../../../constants';
@@ -16,46 +17,42 @@ declare global {
   }
 }
 
-Array.prototype.deepClone = function() {
+Array.prototype.deepClone = function () {
   return JSON.parse(JSON.stringify(this));
 };
 
-export const getRandomDraggableElement = () => {
-  return Cst.ELEMENTS[Math.floor(Math.random() * Cst.ELEMENTS.length)];
-};
+export const getRandomDraggableElement = () =>
+  Cst.ELEMENTS[Math.floor(Math.random() * Cst.ELEMENTS.length)];
 
-export const getEmptyBoard = () => {
-  return Array.from(Array(Cst.VERTICAL_BLOCKS * Cst.BLOCK_HEIGHT), () =>
-    new Array(Cst.HORIZONTAL_BLOCKS * Cst.BLOCK_WIDTH).fill(0)
+export const getEmptyBoard = () =>
+  Array.from(Array(Cst.VERTICAL_BLOCKS * Cst.BLOCK_HEIGHT), () =>
+    new Array(Cst.HORIZONTAL_BLOCKS * Cst.BLOCK_WIDTH).fill(0),
   );
-};
 
-const getInitialState = () => {
-  return {
-    board: getEmptyBoard(),
-    draggableElements: [
-      getRandomDraggableElement(),
-      getRandomDraggableElement(),
-      getRandomDraggableElement(),
-    ],
-    score: 0,
-  };
-};
+const getInitialState = () => ({
+  board: getEmptyBoard(),
+  draggableElements: [
+    getRandomDraggableElement(),
+    getRandomDraggableElement(),
+    getRandomDraggableElement(),
+  ],
+  score: 0,
+});
 
 export const iterateBlock = (
   xBlock: number,
   yBlock: number,
-  func: (x: number, y: number) => boolean | void
+  func: (x: number, y: number) => boolean | void,
 ) => {
   for (
     let y = yBlock * Cst.BLOCK_HEIGHT;
     y < (yBlock + 1) * Cst.BLOCK_HEIGHT;
-    y++
+    y += 1
   ) {
     for (
       let x = xBlock * Cst.BLOCK_WIDTH;
       x < (xBlock + 1) * Cst.BLOCK_WIDTH;
-      x++
+      x += 1
     ) {
       func.apply(null, [x, y]);
     }
@@ -63,14 +60,14 @@ export const iterateBlock = (
 };
 
 export const GameContext = createContext<GameContextProps>(
-  {} as GameContextProps
+  {} as GameContextProps,
 );
 
 export const GameContextProvider = ({ children }) => {
   const localState = JSON.parse(localStorage.getItem('gameState'));
   const [state, dispatch] = useReducer(
     GameReducer,
-    localState || getInitialState()
+    localState || getInitialState(),
   );
   const [firedScoreAnimation, fireScoreAnimation] = useState<
     FiredScoreAnimation
@@ -79,8 +76,8 @@ export const GameContextProvider = ({ children }) => {
   useEffect(() => {
     let blockWasCleared = false;
 
-    for (let yBlock = 0; yBlock < Cst.VERTICAL_BLOCKS; yBlock++) {
-      for (let xBlock = 0; xBlock < Cst.HORIZONTAL_BLOCKS; xBlock++) {
+    for (let yBlock = 0; yBlock < Cst.VERTICAL_BLOCKS; yBlock += 1) {
+      for (let xBlock = 0; xBlock < Cst.HORIZONTAL_BLOCKS; xBlock += 1) {
         if (isBlockCompletelyFilled(xBlock, yBlock)) {
           clearBlock(xBlock, yBlock);
           blockWasCleared = true;
@@ -133,7 +130,7 @@ export const GameContextProvider = ({ children }) => {
         },
       });
     },
-    [state.board, state.draggableElements]
+    [state.board, state.draggableElements],
   );
 
   const clearDraggableElements = useCallback(() => {
@@ -186,7 +183,7 @@ export const GameContextProvider = ({ children }) => {
       }
       return canBeDropped;
     },
-    [state]
+    [state],
   );
 
   const isAnyElementPlaceable = () => {
@@ -201,8 +198,8 @@ export const GameContextProvider = ({ children }) => {
   const isElementPlacable = (elem: ElemCoord[]) => {
     const boardWidth = Cst.HORIZONTAL_BLOCKS * Cst.BLOCK_WIDTH;
     const boardHeight = Cst.VERTICAL_BLOCKS * Cst.BLOCK_HEIGHT;
-    for (let y = 0; y < boardHeight; y++) {
-      for (let x = 0; x < boardWidth; x++) {
+    for (let y = 0; y < boardHeight; y += 1) {
+      for (let x = 0; x < boardWidth; x += 1) {
         let canBeDropped = true;
         for (const elemCoord of elem) {
           if (
@@ -219,8 +216,8 @@ export const GameContextProvider = ({ children }) => {
     return false;
   };
 
-  const contextValue = useMemo(() => {
-    return {
+  const contextValue = useMemo(
+    () => ({
       board: state.board,
       draggableElements: state.draggableElements,
       score: state.score,
@@ -229,16 +226,21 @@ export const GameContextProvider = ({ children }) => {
       clearDraggableElements,
       canElementBeDropped,
       resetGame,
-    };
-  }, [
-    state,
-    dropElement,
-    clearDraggableElements,
-    canElementBeDropped,
-    firedScoreAnimation,
-  ]);
+    }),
+    [
+      state,
+      dropElement,
+      clearDraggableElements,
+      canElementBeDropped,
+      firedScoreAnimation,
+    ],
+  );
 
   return (
     <GameContext.Provider value={contextValue}>{children}</GameContext.Provider>
   );
+};
+
+GameContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };

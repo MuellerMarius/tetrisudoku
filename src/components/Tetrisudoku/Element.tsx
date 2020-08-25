@@ -30,26 +30,26 @@ const DragGrid = styled(Grid)`
   grid-column-gap: 10px;
   margin: inherit;
 
-  left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
-  top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
-  width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE.xlarge}px;
+  top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE.xlarge}px;
+  width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE.xlarge}px;
 
   @media (max-width: 1200px) {
-    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['large']}px;
-    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['large']}px;
-    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['large']}px;
+    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE.large}px;
+    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE.large}px;
+    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE.large}px;
   }
 
   @media (max-width: 992px) {
-    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
-    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
-    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
+    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE.medium}px;
+    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE.medium}px;
+    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE.medium}px;
   }
 
   @media (max-width: 576px) {
-    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE['small']}px;
-    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE['small']}px;
-    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE['small']}px;
+    left: ${({ center }) => center.x * DRAG_ELEMENT_BLOCK_SIZE.small}px;
+    top: ${({ center }) => center.y * DRAG_ELEMENT_BLOCK_SIZE.small}px;
+    width: ${({ width }) => width * DRAG_ELEMENT_BLOCK_SIZE.small}px;
   }
 `;
 
@@ -61,35 +61,35 @@ const GridElement = styled.div<GridElementProps>`
   padding-top: 100%;
   opacity: ${({ isDragging }) => (isDragging ? 0.3 : 1)};
   transition: opacity 0.2s ease-in-out;
-  width: ${PREV_ELEMENT_BLOCK_SIZE['large']}px;
+  width: ${PREV_ELEMENT_BLOCK_SIZE.large}px;
 
   @media (max-width: 1350px) {
-    width: ${PREV_ELEMENT_BLOCK_SIZE['medium']}px;
+    width: ${PREV_ELEMENT_BLOCK_SIZE.medium}px;
   }
 
   @media (max-width: 764px) {
-    width: ${PREV_ELEMENT_BLOCK_SIZE['small']}px;
+    width: ${PREV_ELEMENT_BLOCK_SIZE.small}px;
   }
 `;
 
 const DragGridElement = styled(GridElement)`
   opacity: 1;
-  width: ${DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
-  height: ${DRAG_ELEMENT_BLOCK_SIZE['xlarge']}px;
+  width: ${DRAG_ELEMENT_BLOCK_SIZE.xlarge}px;
+  height: ${DRAG_ELEMENT_BLOCK_SIZE.xlarge}px;
 
   @media (max-width: 1200px) {
-    width: ${DRAG_ELEMENT_BLOCK_SIZE['large']}px;
-    height: ${DRAG_ELEMENT_BLOCK_SIZE['large']}px;
+    width: ${DRAG_ELEMENT_BLOCK_SIZE.large}px;
+    height: ${DRAG_ELEMENT_BLOCK_SIZE.large}px;
   }
 
   @media (max-width: 992px) {
-    width: ${DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
-    height: ${DRAG_ELEMENT_BLOCK_SIZE['medium']}px;
+    width: ${DRAG_ELEMENT_BLOCK_SIZE.medium}px;
+    height: ${DRAG_ELEMENT_BLOCK_SIZE.medium}px;
   }
 
   @media (max-width: 576px) {
-    width: ${DRAG_ELEMENT_BLOCK_SIZE['small']}px;
-    height: ${DRAG_ELEMENT_BLOCK_SIZE['small']}px;
+    width: ${DRAG_ELEMENT_BLOCK_SIZE.small}px;
+    height: ${DRAG_ELEMENT_BLOCK_SIZE.small}px;
   }
 `;
 
@@ -149,6 +149,11 @@ Element.propTypes = {
   isDragging: PropTypes.bool.isRequired,
   drag: PropTypes.func,
   isDragPreview: PropTypes.bool,
+};
+
+Element.defaultProps = {
+  drag: false,
+  isDragPreview: false,
 };
 
 export default React.memo(Element);

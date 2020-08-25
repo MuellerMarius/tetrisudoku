@@ -23,15 +23,18 @@ const Animator = styled.div`
   user-select: none;
 `;
 
-export const ScoreAnimation: React.FC<ScoreAnimationProps> = (props) => {
-  return (
-    <Animator onAnimationEnd={props.onAnimationEnd}>
-      <div unselectable="on">{props.score}</div>
-    </Animator>
-  );
-};
+const ScoreAnimation: React.FC<ScoreAnimationProps> = ({
+  onAnimationEnd,
+  score,
+}) => (
+  <Animator onAnimationEnd={onAnimationEnd}>
+    <div unselectable="on">{score}</div>
+  </Animator>
+);
 
 ScoreAnimation.propTypes = {
-  onAnimationEnd: PropTypes.func,
+  onAnimationEnd: PropTypes.func.isRequired,
   score: PropTypes.number.isRequired,
 };
+
+export default ScoreAnimation;

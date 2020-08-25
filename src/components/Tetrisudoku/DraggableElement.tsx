@@ -26,6 +26,7 @@ const DraggableElement: React.FC<DraggableElementProps> = (props) => {
 
 DraggableElement.propTypes = {
   element: PropTypes.array.isRequired,
+  index: PropTypes.number.isRequired,
   setHover: PropTypes.func.isRequired,
 };
 
