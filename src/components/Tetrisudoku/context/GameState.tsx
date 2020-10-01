@@ -63,11 +63,15 @@ export const GameContext = createContext<GameContextProps>(
   {} as GameContextProps,
 );
 
+const initState = (initialState: Object) => {
+  return JSON.parse(localStorage.getItem('gameState')) || initialState;
+};
+
 export const GameContextProvider = ({ children }) => {
-  const localState = JSON.parse(localStorage.getItem('gameState'));
   const [state, dispatch] = useReducer(
     GameReducer,
-    localState || getInitialState(),
+    getInitialState(),
+    initState,
   );
   const [firedScoreAnimation, fireScoreAnimation] = useState<
     FiredScoreAnimation
