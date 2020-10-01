@@ -17,7 +17,8 @@ declare global {
   }
 }
 
-Array.prototype.deepClone = function () {
+// eslint-disable-next-line no-extend-native
+Array.prototype.deepClone = function deepClone() {
   return JSON.parse(JSON.stringify(this));
 };
 
@@ -44,16 +45,10 @@ export const iterateBlock = (
   yBlock: number,
   func: (x: number, y: number) => boolean | void,
 ) => {
-  for (
-    let y = yBlock * Cst.BLOCK_HEIGHT;
-    y < (yBlock + 1) * Cst.BLOCK_HEIGHT;
-    y += 1
-  ) {
-    for (
-      let x = xBlock * Cst.BLOCK_WIDTH;
-      x < (xBlock + 1) * Cst.BLOCK_WIDTH;
-      x += 1
-    ) {
+  const yMax = (yBlock + 1) * Cst.BLOCK_HEIGHT;
+  for (let y = yBlock * Cst.BLOCK_HEIGHT; y < yMax; y += 1) {
+    const xMax = (xBlock + 1) * Cst.BLOCK_WIDTH;
+    for (let x = xBlock * Cst.BLOCK_WIDTH; x < xMax; x += 1) {
       func.apply(null, [x, y]);
     }
   }
@@ -78,28 +73,6 @@ export const GameContextProvider = ({ children }) => {
   >({} as FiredScoreAnimation);
 
   useEffect(() => {
-    let blockWasCleared = false;
-
-    for (let yBlock = 0; yBlock < Cst.VERTICAL_BLOCKS; yBlock += 1) {
-      for (let xBlock = 0; xBlock < Cst.HORIZONTAL_BLOCKS; xBlock += 1) {
-        if (isBlockCompletelyFilled(xBlock, yBlock)) {
-          clearBlock(xBlock, yBlock);
-          blockWasCleared = true;
-        }
-      }
-    }
-
-    if (
-      !blockWasCleared &&
-      state.draggableElements.length > 0 &&
-      !isAnyElementPlaceable()
-    ) {
-      clearDraggableElements();
-      alert('Game over!');
-    }
-  }, [state]);
-
-  useEffect(() => {
     localStorage.setItem('gameState', JSON.stringify(state));
   }, [state]);
 
@@ -114,17 +87,15 @@ export const GameContextProvider = ({ children }) => {
     (x: number, y: number, index: number) => {
       const tempBoard = state.board.deepClone();
 
-      for (const elemCoord of state.draggableElements[index]) {
+      state.draggableElements[index].forEach((elemCoord) => {
         if (
           state.board[y + elemCoord.y] !== undefined &&
           state.board[y + elemCoord.y][x + elemCoord.x] !== undefined &&
           state.board[y + elemCoord.y][x + elemCoord.x] === 0
         ) {
           tempBoard[y + elemCoord.y][x + elemCoord.x] = elemCoord.val;
-        } else {
-          return;
         }
-      }
+      });
 
       dispatch({
         type: actionType.DROP,
@@ -176,7 +147,7 @@ export const GameContextProvider = ({ children }) => {
     (x: number, y: number, index: number) => {
       let canBeDropped = true;
 
-      for (const elemCoord of state.draggableElements[index]) {
+      state.draggableElements[index].forEach((elemCoord) => {
         if (
           state.board[y + elemCoord.y] === undefined ||
           state.board[y + elemCoord.y][x + elemCoord.x] === undefined ||
@@ -184,20 +155,12 @@ export const GameContextProvider = ({ children }) => {
         ) {
           canBeDropped = false;
         }
-      }
+      });
+
       return canBeDropped;
     },
     [state],
   );
-
-  const isAnyElementPlaceable = () => {
-    for (const element of state.draggableElements) {
-      if (isElementPlacable(element)) {
-        return true;
-      }
-    }
-    return false;
-  };
 
   const isElementPlacable = (elem: ElemCoord[]) => {
     const boardWidth = Cst.HORIZONTAL_BLOCKS * Cst.BLOCK_WIDTH;
@@ -205,7 +168,7 @@ export const GameContextProvider = ({ children }) => {
     for (let y = 0; y < boardHeight; y += 1) {
       for (let x = 0; x < boardWidth; x += 1) {
         let canBeDropped = true;
-        for (const elemCoord of elem) {
+        elem.forEach((elemCoord) => {
           if (
             state.board[y + elemCoord.y] === undefined ||
             state.board[y + elemCoord.y][x + elemCoord.x] === undefined ||
@@ -213,12 +176,46 @@ export const GameContextProvider = ({ children }) => {
           ) {
             canBeDropped = false;
           }
-        }
+        });
+
         if (canBeDropped) return true;
       }
     }
     return false;
   };
+
+  const isAnyElementPlaceable = () => {
+    let result = false;
+    state.draggableElements.forEach((element) => {
+      if (isElementPlacable(element)) {
+        result = true;
+      }
+    });
+    return result;
+  };
+
+  useEffect(() => {
+    let blockWasCleared = false;
+
+    for (let yBlock = 0; yBlock < Cst.VERTICAL_BLOCKS; yBlock += 1) {
+      for (let xBlock = 0; xBlock < Cst.HORIZONTAL_BLOCKS; xBlock += 1) {
+        if (isBlockCompletelyFilled(xBlock, yBlock)) {
+          clearBlock(xBlock, yBlock);
+          blockWasCleared = true;
+        }
+      }
+    }
+
+    if (
+      !blockWasCleared &&
+      state.draggableElements.length > 0 &&
+      !isAnyElementPlaceable()
+    ) {
+      clearDraggableElements();
+      alert('Game over!');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   const contextValue = useMemo(
     () => ({
@@ -231,13 +228,8 @@ export const GameContextProvider = ({ children }) => {
       canElementBeDropped,
       resetGame,
     }),
-    [
-      state,
-      dropElement,
-      clearDraggableElements,
-      canElementBeDropped,
-      firedScoreAnimation,
-    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state],
   );
 
   return (

@@ -93,8 +93,12 @@ const DragGridElement = styled(GridElement)`
   }
 `;
 
-const Element: React.FC<ElementProps> = (props) => {
-  const { element, drag, isDragging, isDragPreview } = props;
+const Element: React.FC<ElementProps> = ({
+  element,
+  drag,
+  isDragging,
+  isDragPreview,
+}) => {
   const [maxValues, setMaxValues] = useState<MinMax>({ x: 0, y: 0 });
   const [minValues, setMinValues] = useState<MinMax>({ x: 0, y: 0 });
 
@@ -102,7 +106,7 @@ const Element: React.FC<ElementProps> = (props) => {
     let min = { x: element[0].x, y: element[0].y };
     let max = { x: element[0].x, y: element[0].y };
 
-    for (const elemCoord of element) {
+    element.forEach((elemCoord) => {
       min = {
         x: elemCoord.x > min.x ? min.x : elemCoord.x,
         y: elemCoord.y > min.y ? min.y : elemCoord.y,
@@ -111,7 +115,7 @@ const Element: React.FC<ElementProps> = (props) => {
         x: elemCoord.x < min.x ? min.x : elemCoord.x,
         y: elemCoord.y < min.y ? min.y : elemCoord.y,
       };
-    }
+    });
 
     setMinValues(min);
     setMaxValues(max);
@@ -119,9 +123,9 @@ const Element: React.FC<ElementProps> = (props) => {
 
   return isDragPreview ? (
     <DragGrid width={maxValues.x - minValues.x + 1} center={minValues}>
-      {element.map((elemCoord, i) => (
+      {element.map((elemCoord) => (
         <DragGridElement
-          key={i}
+          key={`${elemCoord.x}${elemCoord.y}`}
           x={elemCoord.x - minValues.x + 1}
           y={elemCoord.y - minValues.y + 1}
           val={elemCoord.val}
@@ -131,9 +135,9 @@ const Element: React.FC<ElementProps> = (props) => {
     </DragGrid>
   ) : (
     <Grid width={maxValues.x - minValues.x + 1} center={minValues} ref={drag}>
-      {element.map((elemCoord, i) => (
+      {element.map((elemCoord) => (
         <GridElement
-          key={i}
+          key={`${elemCoord.x}${elemCoord.y}`}
           x={elemCoord.x - minValues.x + 1}
           y={elemCoord.y - minValues.y + 1}
           val={elemCoord.val}
@@ -145,9 +149,15 @@ const Element: React.FC<ElementProps> = (props) => {
 };
 
 Element.propTypes = {
-  element: PropTypes.array.isRequired,
+  element: PropTypes.arrayOf(
+    PropTypes.exact({
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired,
+      val: PropTypes.number.isRequired,
+    }),
+  ).isRequired,
   isDragging: PropTypes.bool.isRequired,
-  drag: PropTypes.func,
+  drag: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
   isDragPreview: PropTypes.bool,
 };
 

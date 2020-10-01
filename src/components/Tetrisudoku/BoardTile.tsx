@@ -32,29 +32,27 @@ const HoverOverlay = styled.div<TileHoverProps>`
       : Cst.BLOCK_HOVER_COLOR_NOT_DROPPABLE};
 `;
 
-const BoardTile: React.FC<BoardTileProps> = (props) => {
+const BoardTile: React.FC<BoardTileProps> = ({ hover, hoverElement, x, y }) => {
   const { board, dropElement, canElementBeDropped } = useContext(GameContext);
   const [{ isOver }, drop] = useDrop({
     accept: Cst.TYPE_ELEMENT,
     drop: (item: dragItem) => {
-      dropElement(props.x, props.y, item.index);
+      dropElement(x, y, item.index);
     },
     hover: (item: dragItem) => {
-      hover(item.index);
+      if (!isOver) {
+        hoverElement(x, y, item.index);
+      }
     },
-    canDrop: (item) => canElementBeDropped(props.x, props.y, item.index),
+    canDrop: (item) => canElementBeDropped(x, y, item.index),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
   });
 
-  const hover = (index: number) => {
-    !isOver && props.onHover(props.x, props.y, index);
-  };
-
   return (
-    <TileWrapper value={board[props.y][props.x]} ref={drop}>
-      {props.hover !== 0 && <HoverOverlay isDroppable={props.hover >= 0} />}
+    <TileWrapper value={board[y][x]} ref={drop}>
+      {hover !== 0 && <HoverOverlay isDroppable={hover >= 0} />}
       <LayoutStretcher />
     </TileWrapper>
   );
@@ -64,7 +62,7 @@ BoardTile.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
   hover: PropTypes.number.isRequired,
-  onHover: PropTypes.func.isRequired,
+  hoverElement: PropTypes.func.isRequired,
 };
 
 export default React.memo(BoardTile);

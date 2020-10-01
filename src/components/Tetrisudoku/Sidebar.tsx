@@ -14,6 +14,7 @@ const SidebarWrapper = styled.div`
   margin-bottom: auto;
   background-color: ${Cst.BOARD_BG_COLOR};
   border-radius: 0 10px 10px 0;
+  overflow: auto;
 
   @media (max-width: 768px) {
     width: 90%;
@@ -90,6 +91,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <DragPreview />
         {draggableElements.map((element, index) => (
           <DraggableElement
+            // eslint-disable-next-line react/no-array-index-key
             key={index}
             index={index}
             element={element}

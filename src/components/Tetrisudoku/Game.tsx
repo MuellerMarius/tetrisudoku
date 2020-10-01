@@ -83,8 +83,8 @@ const Game: React.FC = () => {
   } = useContext(GameContext);
 
   useEffect(() => {
-    setScoreAnim((scoreAnimations) =>
-      scoreAnimations.map((elem, index) =>
+    setScoreAnim((oldScoreAnimations) =>
+      oldScoreAnimations.map((elem, index) =>
         index ===
         firedScoreAnimation.yBlock * Cst.HORIZONTAL_BLOCKS +
           firedScoreAnimation.xBlock
@@ -95,9 +95,11 @@ const Game: React.FC = () => {
   }, [firedScoreAnimation]);
 
   const confirmReset = useCallback(() => {
+    // eslint-disable-next-line no-restricted-globals
     if (confirm('Do you really want to start a new game?')) {
       resetGame();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const hoverElement = useCallback(
@@ -106,7 +108,7 @@ const Game: React.FC = () => {
       let tempState = getEmptyBoard();
       let canBeDropped = true;
 
-      for (const elemCoord of element) {
+      element.forEach((elemCoord) => {
         if (
           board[y + elemCoord.y] !== undefined &&
           board[y + elemCoord.y][x + elemCoord.x] !== undefined
@@ -118,9 +120,10 @@ const Game: React.FC = () => {
         } else {
           canBeDropped = false;
         }
-      }
+      });
 
       if (!canBeDropped) {
+        // return negative numbers if element cannot be dropped here
         tempState = tempState.map((row) =>
           row.map((item) => (item !== 0 ? item * -1 : 0)),
         );
@@ -142,7 +145,7 @@ const Game: React.FC = () => {
             x={x}
             y={y}
             hover={hoverState[y][x]}
-            onHover={hoverElement}
+            hoverElement={hoverElement}
           />,
         );
       });
@@ -154,8 +157,8 @@ const Game: React.FC = () => {
             <ScoreAnimation
               score={scoreAnimations[index]}
               onAnimationEnd={() =>
-                setScoreAnim((scoreAnimations) =>
-                  scoreAnimations.map((elem, i) => (i === index ? 0 : elem)),
+                setScoreAnim((oldScoreAnimations) =>
+                  oldScoreAnimations.map((elem, i) => (i === index ? 0 : elem)),
                 )
               }
             />

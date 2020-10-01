@@ -71,7 +71,7 @@ type BoardTileProps = {
   x: number;
   y: number;
   hover: number;
-  onHover: (x: number, y: number, index: number) => void;
+  hoverElement: (x: number, y: number, index: number) => void;
 };
 
 type TileWrapperProps = {

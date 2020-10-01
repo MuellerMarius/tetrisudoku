@@ -47,3 +47,7 @@ const Board: React.FC<BoardProps> = ({ children }) => (
 );
 
 export default React.memo(Board);
+
+Board.propTypes = {
+  children: PropTypes.arrayOf(PropTypes.element).isRequired,
+};

@@ -19,13 +19,20 @@ const DraggableElement: React.FC<DraggableElementProps> = (props) => {
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <Element element={element} drag={drag} isDragging={isDragging} />;
 };
 
 DraggableElement.propTypes = {
-  element: PropTypes.array.isRequired,
+  element: PropTypes.arrayOf(
+    PropTypes.exact({
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired,
+      val: PropTypes.number.isRequired,
+    }),
+  ).isRequired,
   index: PropTypes.number.isRequired,
   setHover: PropTypes.func.isRequired,
 };

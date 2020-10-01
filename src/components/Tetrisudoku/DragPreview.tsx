@@ -38,7 +38,6 @@ const DragPreview: React.FC = () => {
     isDragging: monitor.isDragging(),
   }));
 
-  // TODO: this line solves github issue #6
   if (
     !isDragging ||
     draggableElements.length === 0 ||
